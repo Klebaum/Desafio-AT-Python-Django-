@@ -1,13 +1,27 @@
 <!DOCTYPE html>
-
 <html>
-    <body>
-        <h1>Contact</h1>
-
-        <form method="post" action="{% url 'enviar_email' %}">
-            {% csrf_token %}
-            <input type="email" name="email" required>
-            <button type="submit">Enviar e-mail</button>
-          </form>
-    </body>
+<head>
+    <title>Cotações</title>
+</head>
+<body>
+    <h1>Cotações</h1>
+    <form method="post" action="{% url 'mostrar_cotacoes' %}">
+        {% csrf_token %}
+        <input type="text" name="ativos" required>
+        <button type="submit">Obter Cotações</button>
+    </form>
+    {% for cotacao in cotacoes %}
+    <h2>{{ cotacao.ativo }}</h2>
+    <table>
+        <tr>
+            <th>Close</th>
+        </tr>
+        {% for close_value in cotacao.cotacao %}
+        <tr>
+            <td>{{ close_value }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+</body>
 </html>

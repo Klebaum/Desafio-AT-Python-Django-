@@ -132,6 +132,13 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'investorapp/static')
 ]
 
+SCHEDULED_TASKS = {
+    'checar_ativos': {
+        'task': 'seuapp.tasks.checar_ativos',
+        'schedule': 60,  # Executar a cada 60 segundos (1 minuto)
+    },
+}
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

@@ -11,6 +11,6 @@ ticker = yf.Ticker(ticker)
 
 # Obter os dados da cotação mais recente
 cotacao_atual = ticker.history(period="1d")
-
+close_values = cotacao_atual['Close'].values.tolist()
 # Exibir os dados
-print(cotacao_atual)
+print(close_values)
