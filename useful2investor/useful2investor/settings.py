@@ -27,6 +27,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Configurações de E-mail
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'kleberalmendro01@gmail.com'  # Insira seu e-mail do Gmail aqui
+EMAIL_HOST_PASSWORD = 'vhuelsxztrhaupwj'  # Insira sua senha do Gmail aqui
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'kleberalmendro01@gmail.com'  # Insira seu e-mail do Gmail aqui
+
 
 # Application definition
 
@@ -37,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'investorapp',
 ]
 
 MIDDLEWARE = [
