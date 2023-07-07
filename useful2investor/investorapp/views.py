@@ -44,7 +44,7 @@ def salvar_email(request):
     return render(request, "index.html")
 
 
-def cotações(ativo):
+def get_stock_price(ativo):
     # ativos_b3 = pd.read_csv('acoes-listadas.csv')
     # ativos_b3 = ativos_b3.iloc[:, 0].astype(str).values.tolist()
 
@@ -54,21 +54,20 @@ def cotações(ativo):
     ticker = yf.Ticker(ticker_aux)
 
     # Obter os dados da cotação mais recente
-    cotacao_atual = ticker.history(period="1d")
-    cotacao_atual = ticker.history(period="1d")
+    current_price = ticker.history(period="1d")
 
     # Exibir os dados
-    return cotacao_atual["Close"].values.tolist()
+    return current_price["Close"].values.tolist()
 
 
-def mostrar_cotacoes(request):
+def show_stock_prices(request):
     if request.method == "POST":
-        ativos = request.POST.get("ativos")
-        ativos = ativos.upper().split(",")
+        assets = request.POST.get("assets")
+        assets = assets.upper().split(",")
 
-        cotacoes = []
-        for ativo in ativos:
-            cotacao = cotações(ativo.strip())
-            cotacoes.append({"ativo": ativo.strip(), "cotacao": cotacao})
+        stock_prices = []
+        for asset in assets:
+            stock_price = get_stock_price(asset.strip())
+            stock_prices.append({"asset": asset.strip(), "stock_price": stock_price})
 
-        return render(request, "index.html", {"cotacoes": cotacoes})
+        return render(request, "index.html", {"stock_prices": stock_prices})
