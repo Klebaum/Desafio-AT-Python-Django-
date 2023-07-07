@@ -11,8 +11,7 @@ def indexView(request):
     return render(request, "index.html")
 
 
-"""
-def enviar_email(request):
+def send_email(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         send_mail(
@@ -25,29 +24,24 @@ def enviar_email(request):
         return render(request, 'sucesso.html')
     return render(request, 'index.html')
 
-"""
 
-
-def salvar_email(request):
+def save_email_assets(request):
     if request.method == "POST":
         email = request.POST.get("email")
-
+        assets = request.POST.get("assets")
         # Salvar o e-mail em um arquivo de texto
         with open("emails.txt", "r") as file:
-            emails = file.read().splitlines()
+            emails = file.read()
 
             if email not in emails:
                 with open("emails.txt", "a+") as file:
-                    file.write(email + "\n")
-
-        return render(request, "sucesso.html")
+                    assets = str(assets.upper().split(",")).strip("[]")
+                    file.write(email + " " + assets +  "\n")
+        return render(request, "stock_prices.html")
     return render(request, "index.html")
 
 
 def get_stock_price(ativo):
-    # ativos_b3 = pd.read_csv('acoes-listadas.csv')
-    # ativos_b3 = ativos_b3.iloc[:, 0].astype(str).values.tolist()
-
     ticker_aux = ativo.upper() + ".SA"
 
     # Obter o objeto Ticker para a ação 'ticker'
@@ -70,4 +64,5 @@ def show_stock_prices(request):
             stock_price = get_stock_price(asset.strip())
             stock_prices.append({"asset": asset.strip(), "stock_price": stock_price})
 
-        return render(request, "index.html", {"stock_prices": stock_prices})
+        return render(request, "stock_prices.html", {"stock_prices": stock_prices})
+    return render(request, "index.html")

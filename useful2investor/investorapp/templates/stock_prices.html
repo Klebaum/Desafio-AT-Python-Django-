@@ -4,12 +4,11 @@
     <title>Cotações</title>
 </head>
 <body>
-    <h1>Digite seu email:</h1>
-    <form method="post" action="{% url 'save_email_assets' %}">
+    <h1>Cotações teste</h1>
+    <form method="post" action="{% url 'show_stock_prices' %}">
         {% csrf_token %}
-        <input type="text" name="email" required>
         <input type="text" name="assets" required>
-        <button type="submit">Salvar Email</button>
+        <button type="submit">Obter Cotações</button>
     </form>
     {% for stock_price in stock_prices %}
     <h2>{{ stock_price.asset }}</h2>
