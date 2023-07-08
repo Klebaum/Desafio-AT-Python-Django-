@@ -9,6 +9,56 @@ def indexView(request):
     return render(request, "index.html")
 
 
+from django.shortcuts import render, redirect
+from .models import User, Email, Asset
+
+
+def save_values(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        assets = request.POST.get('assets').split(',')
+        verification_time = request.POST.get('verification_time').split(',')
+        superior_limits = request.POST.get('superior_limits').split(',')
+        inferior_limits = request.POST.get('inferior_limits').split(',')
+
+        user = User(name=name)
+        user.save()
+
+        email_obj = Email(address=email, user=user)
+        email_obj.save()
+
+        for i, asset in enumerate(assets):
+            asset_obj = Asset(name=asset.strip(), verification_time =int(verification_time[i].strip()),
+                              superior_limit = float(superior_limits[i].strip()),
+                              inferior_limit = float(inferior_limits[i].strip()),
+                              user=user)
+            asset_obj.save()
+
+        return redirect('show_values')
+
+    return render(request, 'index.html')
+
+
+def show_values(request):
+    users = User.objects.all()
+    values = []
+    
+    for user in users:
+        email = Email.objects.filter(user=user).first()
+        assets = Asset.objects.filter(user=user)
+        
+        value = {
+            'name': user.name,
+            'email': email.address if email else '',
+            'assets': assets,
+        }
+        
+        values.append(value)
+    
+    return render(request, 'stock_prices.html', {'values': values})
+
+
 def send_email(request):
     if request.method == 'POST':
         email = request.POST.get('email')

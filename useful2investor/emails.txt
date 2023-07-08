@@ -1,7 +1,0 @@
-luanacristinas007@gmail.com 5 ['PETR4','VALE3']
-luanacristinas008@gmail.com 5 ['PETR4']
-kleberalmendro01@gmail.com 5 ['PETR4']
-kleberalmendro02@gmail.com 5 ['PETR4','VALE3']
-kleberalmendro089@gmail.com 1 ['PETR4','VALE3']
-kleberalmendro087@gmail.com 1 ['PETR4','VALE3']
-kleberalmendro0825@gmail.com 1 ['PETR4','VALE3']

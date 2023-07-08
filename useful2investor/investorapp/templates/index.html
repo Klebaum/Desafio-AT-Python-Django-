@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cotações</title>
+    <title>Formulário</title>
 </head>
 <body>
-    <h1>Digite seu email:</h1>
-    <form method="post" action="{% url 'save_email_assets' %}">
+    <h1>Formulário</h1>
+    <form method="post" action="{% url 'save_values' %}">
         {% csrf_token %}
-        <input type="text" name="email" required>
-        <input type="text" name="assets" required>
-        <input type="text" name="minutes" required>
-        <button type="submit">Salvar Email</button>
+        <label for="name">Nome do Usuário:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Endereço de Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="assets">Ativos (separados por vírgula):</label>
+        <input type="text" id="assets" name="assets" required><br><br>
+
+        <label for="verification_time">Tempo de Verificação (minutos):</label>
+        <input type="text" id="verification_time" name="verification_time" required><br><br>
+
+        <label for="superior_limits">Limite Superior:</label>
+        <input type="text" id="superior_limits" name="superior_limits" required><br><br>
+
+        <label for="inferior_limits">Limite Inferior:</label>
+        <input type="text" id="inferior_limits" name="inferior_limits" required><br><br>
+        
+        
+        <input type="submit" value="Salvar">
     </form>
 </body>
 </html>
