@@ -1,2 +1,3 @@
-luanacristinas1904 @ gmail.com
-kleberalmendro01@gmail.com 'PETR4', 'VALE3'
+luanacristinas19@gmail.com ['PETR4','VALE3']
+luanacristinas1904@gmail.com ['PETR4','VALE3']
+kleberalmendro02@gmail.com ['PETR4','VALE3','ITUB4']

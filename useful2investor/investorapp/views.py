@@ -1,10 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 import pandas as pd
 import yfinance as yf
-import schedule
-import time
-
+import ast
 
 # Create your views here.
 def indexView(request):
@@ -35,14 +33,14 @@ def save_email_assets(request):
 
             if email not in emails:
                 with open("emails.txt", "a+") as file:
-                    assets = str(assets.upper().split(",")).strip("[]")
-                    file.write(email + " " + assets +  "\n")
-        return render(request, "stock_prices.html")
+                    assets = str(assets.upper().split(",")).replace(" ", "")
+                    file.write(email + " " + assets + "\n")
+        return redirect(show_stock_prices, email = email)
     return render(request, "index.html")
 
 
-def get_stock_price(ativo):
-    ticker_aux = ativo.upper() + ".SA"
+def get_stock_price(asset):
+    ticker_aux = asset + ".SA"
 
     # Obter o objeto Ticker para a ação 'ticker'
     ticker = yf.Ticker(ticker_aux)
@@ -54,15 +52,27 @@ def get_stock_price(ativo):
     return current_price["Close"].values.tolist()
 
 
-def show_stock_prices(request):
-    if request.method == "POST":
-        assets = request.POST.get("assets")
-        assets = assets.upper().split(",")
+def get_stock_price_2_txt(email):
+    with open("emails.txt", "r") as archive:
+        lines = archive.readlines()
+    
+    assets_founds = []
+    for line in lines:
+        email_line = line.split()[0]
+        print(email_line)
+        if email_line == email:
+            assets_founds = ast.literal_eval(line.split('[', 1)[1].split(']', 1)[0])
+            break
+            
+    return assets_founds  # Retorna uma lista vazia se o email não for encontrado 
 
-        stock_prices = []
-        for asset in assets:
-            stock_price = get_stock_price(asset.strip())
-            stock_prices.append({"asset": asset.strip(), "stock_price": stock_price})
 
-        return render(request, "stock_prices.html", {"stock_prices": stock_prices})
-    return render(request, "index.html")
+def show_stock_prices(request, email):
+    assets = get_stock_price_2_txt(email)
+    stock_prices = []
+
+    for asset in assets:
+        stock_price = get_stock_price(asset)
+        stock_prices.append({"asset": asset, "stock_price": stock_price})
+    return render(request, "stock_prices.html", {"stock_prices": stock_prices})
+    

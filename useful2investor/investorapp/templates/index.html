@@ -11,18 +11,5 @@
         <input type="text" name="assets" required>
         <button type="submit">Salvar Email</button>
     </form>
-    {% for stock_price in stock_prices %}
-    <h2>{{ stock_price.asset }}</h2>
-    <table>
-        <tr>
-            <th>Close</th>
-        </tr>
-        {% for close_value in stock_price.stock_price %}
-        <tr>
-            <td>{{ close_value }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% endfor %}
 </body>
 </html>
