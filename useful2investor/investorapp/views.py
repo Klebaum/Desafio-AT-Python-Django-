@@ -27,6 +27,7 @@ def save_email_assets(request):
     if request.method == "POST":
         email = request.POST.get("email")
         assets = request.POST.get("assets")
+        minutes = request.POST.get("minutes")
         # Salvar o e-mail em um arquivo de texto
         with open("emails.txt", "r") as file:
             emails = file.read()
@@ -34,8 +35,8 @@ def save_email_assets(request):
             if email not in emails:
                 with open("emails.txt", "a+") as file:
                     assets = str(assets.upper().split(",")).replace(" ", "")
-                    file.write(email + " " + assets + "\n")
-        return redirect(show_stock_prices, email = email)
+                    file.write(email + " " + minutes + " " + assets + "\n")
+        return redirect(show_stock_prices, email = email, minutes = minutes)
     return render(request, "index.html")
 
 
@@ -56,23 +57,28 @@ def get_stock_price_2_txt(email):
     with open("emails.txt", "r") as archive:
         lines = archive.readlines()
     
-    assets_founds = []
+    assets_found = []
     for line in lines:
-        email_line = line.split()[0]
-        print(email_line)
+        parts = line.split()
+        email_line = parts[0]
         if email_line == email:
-            assets_founds = ast.literal_eval(line.split('[', 1)[1].split(']', 1)[0])
+            # Encontrou o e-mail correspondente
+            for part in parts[1:]:
+                if part.startswith('[') and part.endswith(']'):
+                    # Parte contendo os ativos
+                    assets_found = ast.literal_eval(part)
+                    break
             break
             
-    return assets_founds  # Retorna uma lista vazia se o email não for encontrado 
+    return assets_found
 
 
-def show_stock_prices(request, email):
+def show_stock_prices(request, email, minutes):
     assets = get_stock_price_2_txt(email)
     stock_prices = []
 
     for asset in assets:
         stock_price = get_stock_price(asset)
         stock_prices.append({"asset": asset, "stock_price": stock_price})
-    return render(request, "stock_prices.html", {"stock_prices": stock_prices})
+    return render(request, "stock_prices.html", {"stock_prices": stock_prices, "minutes": minutes})
     

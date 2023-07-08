@@ -2,6 +2,12 @@
 <html>
 <head>
     <title>Cotações</title>
+    <script>
+        var tempo = parseInt("{{ minutes|default:'1' }}", 10);
+        setTimeout(function() {
+            location.reload();
+        }, tempo * 60000); // Valor do tempo em segundos convertido para milissegundos
+    </script>
 </head>
 <body>
     <h1>Cotações</h1>
