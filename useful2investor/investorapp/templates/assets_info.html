@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Informações dos Ativos</title>
+    {% for asset_info in asset_info_list %}
+        <script>
+            var tempo = "{{ asset_info.verification_time }}"
+            setTimeout(function() {
+                location.reload();
+            }, tempo * 60 * 1000); // Valor do tempo de verificação em minutos convertido para milissegundos
+        </script>
+    {% endfor %}
+</head>
+<body>
+    <h1>Informações dos Ativos</h1>
+    {% if asset_info_list %}
+        {% for asset_info in asset_info_list %}
+            <h2>{{ asset_info.name }} e {{ asset_info.verification_time }} [{{ asset_info.superior_limit }} e {{ asset_info.inferior_limit }}]</h2>
+            <table>
+                <tr>
+                    <th>Date</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                    <th>Volume</th>
+                </tr>
+                {% for info in asset_info.info %}
+                    <tr>
+                        <td>{{ info.Date }}</td>
+                        <td>{{ info.Open }}</td>
+                        <td>{{ info.High }}</td>
+                        <td>{{ info.Low }}</td>
+                        <td>{{ info.Close }}</td>
+                        <td>{{ info.Volume }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+    {% else %}
+        <p>Nenhum ativo encontrado para o email fornecido.</p>
+    {% endif %}
+</body>
+</html>

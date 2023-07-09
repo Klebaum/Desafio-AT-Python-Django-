@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
+from django.utils import timezone
+from datetime import datetime, timedelta
 import pandas as pd
 import yfinance as yf
 import ast
@@ -17,7 +19,7 @@ def save_values(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         email = request.POST.get('email')
-        assets = request.POST.get('assets').split(',')
+        assets = request.POST.get('assets').upper().split(',')
         verification_time = request.POST.get('verification_time').split(',')
         superior_limits = request.POST.get('superior_limits').split(',')
         inferior_limits = request.POST.get('inferior_limits').split(',')
@@ -29,13 +31,13 @@ def save_values(request):
         email_obj.save()
 
         for i, asset in enumerate(assets):
-            asset_obj = Asset(name=asset.strip(), verification_time =int(verification_time[i].strip()),
+            asset_obj = Asset(name=asset.strip() + ".SA", verification_time =int(verification_time[i].strip()),
                               superior_limit = float(superior_limits[i].strip()),
                               inferior_limit = float(inferior_limits[i].strip()),
                               user=user)
             asset_obj.save()
 
-        return redirect('show_values')
+        return redirect('show_asset_info', email=email)
 
     return render(request, 'index.html')
 
@@ -59,76 +61,58 @@ def show_values(request):
     return render(request, 'stock_prices.html', {'values': values})
 
 
-def send_email(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        send_mail(
-            'Compra ativos',
-            'Você deveria comprar ativos!',
-            'kleberalmendro01@gmail.com',
-            [email],
-            fail_silently=False,
-        )
-        return render(request, 'sucesso.html')
-    return render(request, 'index.html')
-
-
-def save_email_assets(request):
-    if request.method == "POST":
-        email = request.POST.get("email")
-        assets = request.POST.get("assets")
-        minutes = request.POST.get("minutes")
-        # Salvar o e-mail em um arquivo de texto
-        with open("emails.txt", "r") as file:
-            emails = file.read()
-
-            if email not in emails:
-                with open("emails.txt", "a+") as file:
-                    assets = str(assets.upper().split(",")).replace(" ", "")
-                    file.write(email + " " + minutes + " " + assets + "\n")
-        return redirect(show_stock_prices, email = email, minutes = minutes)
-    return render(request, "index.html")
-
-
-def get_stock_price(asset):
-    ticker_aux = asset + ".SA"
-
-    # Obter o objeto Ticker para a ação 'ticker'
-    ticker = yf.Ticker(ticker_aux)
-
-    # Obter os dados da cotação mais recente
-    current_price = ticker.history(period="1d")
-
-    # Exibir os dados
-    return current_price["Close"].values.tolist()
-
-
-def get_stock_price_2_txt(email):
-    with open("emails.txt", "r") as archive:
-        lines = archive.readlines()
+def get_assets_info(email):
+    assets = Asset.objects.filter(user__email__address=email)
+    asset_info_list = []
     
-    assets_found = []
-    for line in lines:
-        parts = line.split()
-        email_line = parts[0]
-        if email_line == email:
-            # Encontrou o e-mail correspondente
-            for part in parts[1:]:
-                if part.startswith('[') and part.endswith(']'):
-                    # Parte contendo os ativos
-                    assets_found = ast.literal_eval(part)
-                    break
-            break
-            
-    return assets_found
-
-
-def show_stock_prices(request, email, minutes):
-    assets = get_stock_price_2_txt(email)
-    stock_prices = []
-
     for asset in assets:
-        stock_price = get_stock_price(asset)
-        stock_prices.append({"asset": asset, "stock_price": stock_price})
-    return render(request, "stock_prices.html", {"stock_prices": stock_prices, "minutes": minutes})
+        info = yf.Ticker(asset.name).history(period="1d")
+        asset_info_list.append(
+            {'name': asset.name, 'superior_limit': asset.superior_limit, 'inferior_limit': asset.inferior_limit,
+             'verification_time': asset.verification_time, 'info': info.reset_index().to_dict('records')})
     
+    return asset_info_list
+
+
+def show_asset_info(request, email):
+    asset_info_list = get_assets_info(email)
+    send_email(asset_info_list, email)
+    return render(request, 'assets_info.html', {'asset_info_list': asset_info_list})
+
+def send_email(asset_info_list, email):
+    email_obj = Email.objects.get(address=email)
+    user = email_obj.user
+    
+    current_time = timezone.make_aware(datetime.now(), timezone.get_current_timezone())
+    
+    for asset_info in asset_info_list:
+        assets = Asset.objects.filter(user=user, name=asset_info['name'])
+        
+        for asset in assets:
+            last_updated = asset.updated_at
+            time_difference = current_time - last_updated
+            
+            if time_difference.total_seconds() >= asset.verification_time * 60:
+                if asset_info['info'][0]['Close'] > asset.superior_limit:
+                    message = f"Venda ativos: {asset_info['name']}"
+                    send_mail(
+                        'Venda ativos',
+                        message,
+                        email_obj.address,
+                        [email_obj.address],
+                        fail_silently=False,
+                    )
+                elif asset_info['info'][0]['Close'] < asset.inferior_limit:
+                    message = f"Compre ativos: {asset_info['name']}"
+                    send_mail(
+                        'Compre ativos',
+                        message,
+                        email_obj.address,
+                        [email_obj.address],
+                        fail_silently=False,
+                    )
+                
+                # Atualizar o campo updated_at para o tempo atual
+                asset.updated_at = current_time
+                asset.save()
+
