@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <title>Add Assets</title>
+</head>
+<body>
+    <div class = 'conta'>
+        <h1>Add Assets</h1>
+        <form method="post">
+            {% csrf_token %}
+            <label for="asset_name">Asset Name:</label>
+            <input type="text" id="asset_name" name="asset_name" required><br><br>
+
+            <label for="verification_time">Verification Time (minutes):</label>
+            <input type="number" id="verification_time" name="verification_time" required><br><br>
+
+            <label for="superior_limit">Superior Limit:</label>
+            <input type="number" step="0.01" id="superior_limit" name="superior_limit" required><br><br>
+
+            <label for="inferior_limit">Inferior Limit:</label>
+            <input type="number" step="0.01" id="inferior_limit" name="inferior_limit" required><br><br>
+
+            <input type="submit" value="Add" class="btn2">
+        </form>
+    </div>
+</body>
+</html>

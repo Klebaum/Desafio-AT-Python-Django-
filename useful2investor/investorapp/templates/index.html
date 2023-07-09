@@ -1,32 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <title>Formulário</title>
 </head>
 <body>
-    <h1>Formulário</h1>
-    <form method="post" action="{% url 'save_values' %}">
-        {% csrf_token %}
-        <label for="name">Nome do Usuário:</label>
-        <input type="text" id="name" name="name" required><br><br>
+    <div class="container"> 
+        <h1>Formulário</h1>
 
-        <label for="email">Endereço de Email:</label>
-        <input type="email" id="email" name="email" required><br><br>
+        <form method="post" action="{% url 'save_values' %}" class="form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="name">Nome do Usuário:</label>
+                <input type="text" id="name" name="name" required placeholder="Nome do Usuário">
+            </div>
 
-        <label for="assets">Ativos (separados por vírgula):</label>
-        <input type="text" id="assets" name="assets" required><br><br>
+            <div class="form-group">
+                <label for="email">Endereço de Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
 
-        <label for="verification_time">Tempo de Verificação (minutos):</label>
-        <input type="text" id="verification_time" name="verification_time" required><br><br>
+            <div class="form-group">
+                <label for="assets">Ativos (separados por vírgula):</label>
+                <input type="text" id="assets" name="assets" required>
+            </div>
 
-        <label for="superior_limits">Limite Superior:</label>
-        <input type="text" id="superior_limits" name="superior_limits" required><br><br>
+            <div class="form-group">
+                <label for="verification_time">Tempo de Verificação (minutos):</label>
+                <input type="text" id="verification_time" name="verification_time" required>
+            </div>
 
-        <label for="inferior_limits">Limite Inferior:</label>
-        <input type="text" id="inferior_limits" name="inferior_limits" required><br><br>
-        
-        
-        <input type="submit" value="Salvar">
-    </form>
+            <div class="form-group">
+                <label for="superior_limits">Limite Superior:</label>
+                <input type="text" id="superior_limits" name="superior_limits" required>
+            </div>
+
+            <div class="form-group">
+                <label for="inferior_limits">Limite Inferior:</label>
+                <input type="text" id="inferior_limits" name="inferior_limits" required>
+            </div>
+            
+            <input type="submit" value="Salvar" class="btn1">
+        </form>
+    </div>
 </body>
 </html>

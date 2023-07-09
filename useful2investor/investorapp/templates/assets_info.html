@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
     <title>Informações dos Ativos</title>
     {% for asset_info in asset_info_list %}
         <script>
@@ -12,33 +14,44 @@
     {% endfor %}
 </head>
 <body>
-    <h1>Informações dos Ativos</h1>
-    {% if asset_info_list %}
-        {% for asset_info in asset_info_list %}
-            <h2>{{ asset_info.name }} e {{ asset_info.verification_time }} [{{ asset_info.superior_limit }} e {{ asset_info.inferior_limit }}]</h2>
-            <table>
-                <tr>
-                    <th>Date</th>
-                    <th>Open</th>
-                    <th>High</th>
-                    <th>Low</th>
-                    <th>Close</th>
-                    <th>Volume</th>
-                </tr>
-                {% for info in asset_info.info %}
+    <div class="conta">
+        <h1>Informações dos Ativos</h1>
+        {% if asset_info_list %}
+            {% for asset_info in asset_info_list %}
+                <h2>{{ asset_info.name }} Verificação a cada {{asset_info.verification_time}} min</h2>
+                <table class = "tl_assets">
                     <tr>
-                        <td>{{ info.Date }}</td>
-                        <td>{{ info.Open }}</td>
-                        <td>{{ info.High }}</td>
-                        <td>{{ info.Low }}</td>
-                        <td>{{ info.Close }}</td>
-                        <td>{{ info.Volume }}</td>
+                        <th>Date</th>
+                        <th>Open</th>
+                        <th>High</th>
+                        <th>Low</th>
+                        <th>Close</th>
+                        <th>Volume</th>
+                        <th>Limites[sup, inf]</th>
                     </tr>
-                {% endfor %}
-            </table>
-        {% endfor %}
-    {% else %}
-        <p>Nenhum ativo encontrado para o email fornecido.</p>
-    {% endif %}
+                    {% for info in asset_info.info %}
+                        <tr>
+                            <td>{{ info.Date|date:"m/d/Y" }}</td>
+                            <td>{{ info.Open|floatformat:2 }}</td>
+                            <td>{{ info.High|floatformat:2 }}</td>
+                            <td>{{ info.Low|floatformat:2 }}</td>
+                            <td>{{ info.Close|floatformat:2 }}</td>
+                            <td>{{ info.Volume|floatformat:2 }}</td>
+                            <td>[{{ asset_info.superior_limit }}, {{ asset_info.inferior_limit }}]</td
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endfor %}
+        {% else %}
+            <p>Nenhum ativo encontrado para o email fornecido.</p>
+        {% endif %}
+        
+        <table class="tl_assets">
+            <tr>
+                <th><a href="{% url 'add_assets' email=email%}" class="btn_asset">Add Assets</a></th>
+                <th><a href="{% url 'remove_assets' email=email%}" class="btn_asset">Remove Assets</a></th>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>

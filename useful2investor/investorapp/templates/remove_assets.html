@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <title>Remove Assets</title>
+</head>
+<body>
+    <div class="conta2">
+        <h1>Remove Assets</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for asset in assets %}
+                <label>
+                    <input type="checkbox" name="assets_to_remove" value="{{ asset.id }}">
+                    {{ asset.name }}
+                </label><br>
+            {% endfor %}
+
+            <input type="submit" value="Remove" class="btn3">
+        </form>
+    </div>
+</body>
+</html>

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
+from django.shortcuts import render, redirect
 from django.utils import timezone
 from datetime import datetime, timedelta
 import pandas as pd
@@ -77,7 +78,7 @@ def get_assets_info(email):
 def show_asset_info(request, email):
     asset_info_list = get_assets_info(email)
     send_email(asset_info_list, email)
-    return render(request, 'assets_info.html', {'asset_info_list': asset_info_list})
+    return render(request, 'assets_info.html', {'asset_info_list': asset_info_list, 'email': email})
 
 def send_email(asset_info_list, email):
     email_obj = Email.objects.get(address=email)
@@ -116,3 +117,32 @@ def send_email(asset_info_list, email):
                 asset.updated_at = current_time
                 asset.save()
 
+
+def add_assets(request, email):
+    if request.method == 'POST':
+        asset_name = request.POST.get('asset_name')
+        verification_time = int(request.POST.get('verification_time'))
+        superior_limit = float(request.POST.get('superior_limit'))
+        inferior_limit = float(request.POST.get('inferior_limit'))
+
+        user = User.objects.get(email__address=email)
+        Asset.objects.create(name=asset_name.upper() + '.SA', verification_time=verification_time,
+                             superior_limit=superior_limit, inferior_limit=inferior_limit, user=user)
+
+        return redirect('show_asset_info', email=email)
+
+    return render(request, 'add_assets.html')
+
+def remove_assets(request, email):
+    user = User.objects.get(email__address=email)
+    assets = Asset.objects.filter(user=user)
+
+    if request.method == 'POST':
+        assets_to_remove = request.POST.getlist('assets_to_remove')
+
+        for asset_id in assets_to_remove:
+            Asset.objects.filter(id=asset_id).delete()
+
+        return redirect('show_asset_info', email=email)
+
+    return render(request, 'remove_assets.html', {'assets': assets})
