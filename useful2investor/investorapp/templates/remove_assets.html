@@ -17,8 +17,12 @@
                     {{ asset.name }}
                 </label><br>
             {% endfor %}
-
-            <input type="submit" value="Remove" class="btn3">
+            <table class="tl_remove">
+                <tr>
+                    <th><input type="submit" value="Remove" class="btn3"></th>
+                    <th><a href="javascript:history.back()" class="btn3">Voltar</a></th>
+                </tr>
+            </table>
         </form>
     </div>
 </body>

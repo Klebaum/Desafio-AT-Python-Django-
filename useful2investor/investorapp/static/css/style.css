@@ -25,7 +25,7 @@ body{
 
 .conta2 {
     font-family: 'Lucida Console', Monaco, monospace;
-    max-width: 500px;
+    max-width: 600px;
     margin: auto;
     padding: 20px;
     border: 1px solid #ddd;
@@ -36,6 +36,14 @@ body{
 .tl_assets{
     width: 100%;
     text-align: center;
+}
+
+.tl_remove{
+    width: 80%;
+}
+
+.tl_add{
+    width: 70%;
 }
 
 h1 {
