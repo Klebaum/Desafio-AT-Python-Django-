@@ -28,6 +28,7 @@
                         <th>Close</th>
                         <th>Volume</th>
                         <th>Limites[sup, inf]</th>
+                        <th>Atualizar Valores</th>
                     </tr>
                     {% for info in asset_info.info %}
                         <tr>
@@ -37,9 +38,10 @@
                             <td>{{ info.Low|floatformat:2 }}</td>
                             <td>{{ info.Close|floatformat:2 }}</td>
                             <td>{{ info.Volume|floatformat:2 }}</td>
-                            <td>[{{ asset_info.superior_limit }}, {{ asset_info.inferior_limit }}]</td
-                        </tr>
+                            <td>[{{ asset_info.superior_limit }}, {{ asset_info.inferior_limit }}]</td>
                     {% endfor %}
+                            <td><a href="{% url 'update_asset' email=email asset=asset_info.name %}" class="btn_att">Atualizar</a></td>
+                        </tr>
                 </table>
             {% endfor %}
         {% else %}
@@ -48,8 +50,8 @@
         
         <table class="tl_assets">
             <tr>
-                <th><a href="{% url 'add_assets' email=email%}" class="btn_asset">Add Assets</a></th>
-                <th><a href="{% url 'remove_assets' email=email%}" class="btn_asset">Remove Assets</a></th>
+                <th><a href="{% url 'add_assets' email=email%}" class="btn_asset">Adicionar Ativo</a></th>
+                <th><a href="{% url 'remove_assets' email=email%}" class="btn_asset">Remover Ativo</a></th>
             </tr>
         </table>
     </div>

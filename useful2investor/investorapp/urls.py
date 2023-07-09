@@ -7,4 +7,6 @@ urlpatterns = [
     path("show_asset_info/<str:email>/", views.show_asset_info, name="show_asset_info"),
     path('remove_assets/<str:email>/', views.remove_assets, name='remove_assets'),
     path('add_assets/<str:email>/', views.add_assets, name='add_assets'),
+    path('update_asset/<str:email>/<str:asset>/', views.update_asset, name='update_asset'),
+
 ]

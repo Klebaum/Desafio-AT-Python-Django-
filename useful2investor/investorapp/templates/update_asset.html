@@ -7,24 +7,24 @@
 </head>
 <body>
     <div class = 'conta'>
-        <h1>Adicionar Ativos</h1>
+        <h1>Atualizar Ativo</h1>
         <form method="post">
             {% csrf_token %}
             <label for="asset_name">Nome do Ativo:</label>
-            <input type="text" id="asset_name" name="asset_name" required><br><br>
+            <input type="text" disabled id="asset_name" name="asset_name" value="{{ asset.name }}" required><br><br>
 
             <label for="verification_time">Tempo de Verificação (minutos):</label>
-            <input type="number" id="verification_time" name="verification_time" required><br><br>
+            <input type="number" id="verification_time" name="verification_time" value="{{ asset.verification_time }}" required><br><br>
 
             <label for="superior_limit">Limite Superior:</label>
-            <input type="number" step="0.01" id="superior_limit" name="superior_limit" required><br><br>
+            <input type="number" step="0.01" id="superior_limit" name="superior_limit" value="{{ asset.superior_limit }}" required><br><br>
 
             <label for="inferior_limit">Limite Inferior:</label>
-            <input type="number" step="0.01" id="inferior_limit" name="inferior_limit" required><br><br>
+            <input type="number" step="0.01" id="inferior_limit" name="inferior_limit" value="{{ asset.inferior_limit }}" required><br><br>
             
             <table class="tl_add">
                 <tr>
-                    <th><input type="submit" value="Adicionar" class="btn2"></th>
+                    <th><input type="submit" value="Atualizar" class="btn2"></th>
                     <th><a href="javascript:history.back()" class="btn2">Voltar</a></th>
                 </tr>
         </form>

@@ -25,9 +25,13 @@ def save_values(request):
         superior_limits = request.POST.get('superior_limits').split(',')
         inferior_limits = request.POST.get('inferior_limits').split(',')
 
+        if Email.objects.filter(address=email).exists():
+            # O email já existe, redirecionar para show_asset_info com o email digitado
+            return redirect('show_asset_info', email=email)
+
         user = User(name=name)
         user.save()
-
+        
         email_obj = Email(address=email, user=user)
         email_obj.save()
 
@@ -146,3 +150,22 @@ def remove_assets(request, email):
         return redirect('show_asset_info', email=email)
 
     return render(request, 'remove_assets.html', {'assets': assets})
+
+def update_asset(request, email, asset):
+    user = User.objects.get(email__address=email)
+    asset = Asset.objects.get(user=user, name=asset)
+
+    if request.method == 'POST':
+        verification_time = int(request.POST.get('verification_time'))
+        superior_limit = float(request.POST.get('superior_limit'))
+        inferior_limit = float(request.POST.get('inferior_limit'))
+
+        asset.verification_time = verification_time
+        asset.superior_limit = superior_limit
+        asset.inferior_limit = inferior_limit
+        asset.save()
+
+        return redirect('show_asset_info', email=email)
+
+    return render(request, 'update_asset.html', {'asset': asset})
+    
