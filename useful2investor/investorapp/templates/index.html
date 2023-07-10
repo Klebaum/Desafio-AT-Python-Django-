@@ -8,9 +8,11 @@
 <body>
     <div class="container"> 
         <h1>Formulário</h1>
-
         <form method="post" action="{% url 'save_values' %}" class="form">
             {% csrf_token %}
+            {% if error %}
+                <p>{{ error }}</p>
+            {% endif %}
             <div class="form-group">
                 <label for="name">Nome do Usuário:</label>
                 <input type="text" id="name" name="name" required placeholder="Nome do Usuário">

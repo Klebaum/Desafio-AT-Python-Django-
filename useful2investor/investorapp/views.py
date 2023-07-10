@@ -38,6 +38,16 @@ def save_values(request):
         superior_limits = request.POST.get("superior_limits").split(",")
         inferior_limits = request.POST.get("inferior_limits").split(",")
 
+        for superior_limit, inferior_limit in zip(superior_limits, inferior_limits):
+            if float(superior_limit) < float(inferior_limit):
+                return render(
+                    request,
+                    "index.html",
+                    {
+                        "error": "O limite superior deve ser maior que o limite inferior."
+                    },
+                )
+            
         if Email.objects.filter(address=email).exists():
             # O email já existe, redirecionar para show_asset_info com o email digitado
             return redirect("show_asset_info", email=email)
