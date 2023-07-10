@@ -1,22 +1,34 @@
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
+from .models import User, Email, Asset
 from django.utils import timezone
-from datetime import datetime, timedelta
-import pandas as pd
+from datetime import datetime
 import yfinance as yf
-import ast
 
 # Create your views here.
 def indexView(request):
+    """View function for the index page.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: The HTTP response object containing the rendered index page.
+    """
     return render(request, "index.html")
 
 
-from django.shortcuts import render, redirect
-from .models import User, Email, Asset
-
-
 def save_values(request):
+    """Function to save the values from the form in the database.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        Redirect: Redirect the user to show_asset_info view with the email at the URL.
+        HttpResponse: The HTTP response object containing the rendered index page.
+    """
     if request.method == 'POST':
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -48,6 +60,14 @@ def save_values(request):
 
 
 def show_values(request):
+    """Function to show values from the database in the Html form.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: The HTTP response object containing the rendered stock_price page and the values. 
+    """
     users = User.objects.all()
     values = []
     
@@ -67,6 +87,14 @@ def show_values(request):
 
 
 def get_assets_info(email):
+    """Function to get the assets information from the database.
+    
+    Args:
+        email (str): The email of the user.
+
+    Returns:
+        List: A list of dictionaries containing the assets information.
+    """
     assets = Asset.objects.filter(user__email__address=email)
     asset_info_list = []
     
@@ -80,11 +108,31 @@ def get_assets_info(email):
 
 
 def show_asset_info(request, email):
+    """Function to show the assets information in the Html page.
+    
+    Args:
+        request (HttpRequest): The HTTP request object.
+        email (str): The email of the user.
+
+    Returns:
+        email (str): The email of the user.
+        HttpResponse: The HTTP response object containing the rendered assets_info page and the assets information.
+    """
     asset_info_list = get_assets_info(email)
     send_email(asset_info_list, email)
     return render(request, 'assets_info.html', {'asset_info_list': asset_info_list, 'email': email})
 
 def send_email(asset_info_list, email):
+    """Function to send an email to the user if the asset price is above the superior limit or 
+    below the inferior limit.
+    
+    Args:
+        asset_info_list (List): A list of dictionaries containing the assets information.
+        email (str): The email of the user.
+
+    Returns:
+        None
+    """
     email_obj = Email.objects.get(address=email)
     user = email_obj.user
     
@@ -123,6 +171,16 @@ def send_email(asset_info_list, email):
 
 
 def add_assets(request, email):
+    """Function to add assets to the database.
+    
+    Args:
+        request (HttpRequest): The HTTP request object.
+        email (str): The email of the user.
+
+    Returns:
+        Redirect: Redirects to the show_asset_info page view with the email at the URL.
+        HttpResponse: The HTTP response object containing the rendered add_assets page.
+    """
     if request.method == 'POST':
         asset_name = request.POST.get('asset_name')
         verification_time = int(request.POST.get('verification_time'))
@@ -138,6 +196,16 @@ def add_assets(request, email):
     return render(request, 'add_assets.html')
 
 def remove_assets(request, email):
+    """Function to remove assets from the database.
+    
+    Args:
+        request (HttpRequest): The HTTP request object.
+        email (str): The email of the user.
+
+    Returns:
+        Redirect: Redirects to the show_asset_info page view with the email at the URL.
+        HttpResponse: The HTTP response object containing the rendered remove_assets page.
+    """
     user = User.objects.get(email__address=email)
     assets = Asset.objects.filter(user=user)
 
@@ -152,6 +220,17 @@ def remove_assets(request, email):
     return render(request, 'remove_assets.html', {'assets': assets})
 
 def update_asset(request, email, asset):
+    """Function to update the asset information in the database.
+    
+    Args:
+        request (HttpRequest): The HTTP request object.
+        email (str): The email of the user.
+        asset (str): The name of the asset.
+
+    Returns:
+        Redirect: Redirects to the show_asset_info page view with the email at the URL.
+        HttpResponse: The HTTP response object containing the rendered update_asset page.
+    """
     user = User.objects.get(email__address=email)
     asset = Asset.objects.get(user=user, name=asset)
 
