@@ -11,7 +11,7 @@
         <form method="post" action="{% url 'save_values' %}" class="form">
             {% csrf_token %}
             {% if error %}
-                <p>{{ error }}</p>
+                <p>{{ error }}{{ asset }}:{{ ticker }}</p>
             {% endif %}
             <div class="form-group">
                 <label for="name">Nome do Usuário:</label>

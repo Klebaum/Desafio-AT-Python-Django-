@@ -65,17 +65,43 @@ def save_values(request):
         verification_time = request.POST.get("verification_time").split(",")
         superior_limits = request.POST.get("superior_limits").split(",")
         inferior_limits = request.POST.get("inferior_limits").split(",")
-
-        for superior_limit, inferior_limit in zip(superior_limits, inferior_limits):
-            if float(superior_limit) < float(inferior_limit):
+        
+        for asset in assets:
+            if not yf.Ticker(asset.strip() + ".SA").info:
                 return render(
                     request,
                     "index.html",
                     {
-                        "error": "O limite superior deve ser maior que o limite inferior."
+                        "error": "Ativo não encontrado.", asset: 'asset'
                     },
                 )
-            
+            for superior_limit, inferior_limit in zip(superior_limits, inferior_limits):
+                ticker = float((str(yf.Ticker(asset.strip() + ".SA").history(period="1d")["Close"]).strip().split(' ')[5].split('\n')[0]).replace(',', '.')) 
+                if ticker > float(superior_limit):
+                    return render(
+                        request,
+                        "index.html",
+                        {
+                            "error": "O limite superior deve ser maior que o preço atual.", 'asset': asset, 'ticker': ticker
+                        },
+                    )
+                elif ticker < float(inferior_limit):
+                    return render(
+                        request,
+                        "index.html",
+                        {
+                            "error": "O limite inferior deve ser menor que o preço atual.", 'asset': asset, 'ticker': ticker
+                        },
+                    )
+                elif float(superior_limit) < float(inferior_limit):
+                    return render(
+                        request,
+                        "index.html",
+                        {
+                            "error": "O limite superior deve ser maior que o limite inferior.", 'asset': asset, 'ticker': ticker
+                        },
+                    )
+
         user = User(name=name)
         user.save()
 
