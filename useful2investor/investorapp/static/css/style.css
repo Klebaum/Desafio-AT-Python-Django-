@@ -144,8 +144,3 @@ input[type=email] {
     text-align: center;
     margin-left: 45px;
 }
-
-
-input[type="submit"]:hover {
-    background-color: #0c7274;
-}

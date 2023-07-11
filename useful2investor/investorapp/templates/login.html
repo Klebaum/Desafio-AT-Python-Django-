@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <title>Formulário</title>
+</head>
+<body>
+    <div class="container"> 
+        <h1>Formulário</h1>
+        <form method="post" action="{% url 'login' %}" class="form">
+            {% csrf_token %}
+            {% if error %}
+                <p>{{ error }}</p>
+            {% endif %}
+            <div class="form-group">
+                <label for="email">Endereço de Email:</label>
+                <input type="email" id="email" name="email" required placeholder="email@example.com">
+            </div>
+            <table>
+                <tr>
+                    <th><input type="submit" value="Login" class="btn_asset"></th>
+                    <th><a href="{% url 'save_values' %}" values="Cadastrar" class="btn_asset">Cadastrar</a></th>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+</html>

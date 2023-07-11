@@ -20,6 +20,31 @@ def indexView(request):
     return render(request, "index.html")
 
 
+def login(request):
+    """View function for the login page.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+
+    Returns:
+        HttpResponse: The HTTP response object containing the rendered login page or a redirect response.
+    """
+    if request.method == "POST":
+        email = request.POST.get("email")
+        if Email.objects.filter(address=email).exists():
+            return redirect("show_asset_info", email=email)
+        else:
+            return render(
+                    request,
+                    "login.html",
+                    {
+                        "error": "Email não cadastrado."
+                    },
+                )
+
+    return render(request, "login.html")
+
+
 def save_values(request):
     """Function to save the values from the form in the database.
 
@@ -31,8 +56,11 @@ def save_values(request):
         HttpResponse: The HTTP response object containing the rendered index page.
     """
     if request.method == "POST":
-        name = request.POST.get("name")
         email = request.POST.get("email")
+        if Email.objects.filter(address=email).exists():
+            # O email já existe, redirecionar para show_asset_info com o email digitado
+            return redirect("show_asset_info", email=email)
+        name = request.POST.get("name")
         assets = request.POST.get("assets").upper().split(",")
         verification_time = request.POST.get("verification_time").split(",")
         superior_limits = request.POST.get("superior_limits").split(",")
@@ -48,10 +76,6 @@ def save_values(request):
                     },
                 )
             
-        if Email.objects.filter(address=email).exists():
-            # O email já existe, redirecionar para show_asset_info com o email digitado
-            return redirect("show_asset_info", email=email)
-
         user = User(name=name)
         user.save()
 
