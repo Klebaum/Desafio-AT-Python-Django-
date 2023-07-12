@@ -11,36 +11,36 @@
         <form method="post" action="{% url 'save_values' %}" class="form">
             {% csrf_token %}
             {% if error %}
-                <p>{{ error }}{{ asset }}:{{ ticker }}</p>
+                <p>{{ error }}{{ asset }}:{{ ticker|floatformat:2 }}</p>
             {% endif %}
             <div class="form-group">
                 <label for="name">Nome do Usuário:</label>
-                <input type="text" id="name" name="name" required placeholder="Nome do Usuário">
+                <input type="text" id="name" name="name" required placeholder="Nome do Usuário" value="{{ name }}">
             </div>
 
             <div class="form-group">
                 <label for="email">Endereço de Email:</label>
-                <input type="email" id="email" name="email" required placeholder="email@email.com">
+                <input type="email" id="email" name="email" required placeholder="email@email.com" value="{{ email }}">
             </div>
 
             <div class="form-group">
                 <label for="assets">Ativos (separados por vírgula):</label>
-                <input type="text" id="assets" name="assets" required placeholder="petr4,vale3,itub4">
+                <input type="text" id="assets" name="assets" required placeholder="petr4,vale3,itub4" value="{{ assets }}">
             </div>
 
             <div class="form-group">
                 <label for="verification_time">Tempo de Verificação (minutos):</label>
-                <input type="text" id="verification_time" name="verification_time" required placeholder="5,2,3">
+                <input type="text" id="verification_time" name="verification_time" required placeholder="5,2,3" value="{{ verification_time }}">
             </div>
 
             <div class="form-group">
                 <label for="superior_limits">Limite Superior:</label>
-                <input type="text" id="superior_limits" name="superior_limits" required placeholder="40,50,20">
+                <input type="text" id="superior_limits" name="superior_limits" required placeholder="40,50,20" value="{{ superior_limits }}">
             </div>
 
             <div class="form-group">
                 <label for="inferior_limits">Limite Inferior:</label>
-                <input type="text" id="inferior_limits" name="inferior_limits" required placeholder="30,40,10">
+                <input type="text" id="inferior_limits" name="inferior_limits" required placeholder="30,40,10" value="{{ inferior_limits }}">
             </div>
             
             <input type="submit" value="Salvar" class="btn1">

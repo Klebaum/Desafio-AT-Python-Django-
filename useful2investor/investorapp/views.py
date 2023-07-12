@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
-from .models import User, Email, Asset
+from django.http import Http404
 from django.utils import timezone
+from .models import User, Email, Asset
 from datetime import datetime
 import yfinance as yf
 
@@ -60,47 +61,78 @@ def save_values(request):
         if Email.objects.filter(address=email).exists():
             # O email já existe, redirecionar para show_asset_info com o email digitado
             return redirect("show_asset_info", email=email)
+        
         name = request.POST.get("name")
         assets = request.POST.get("assets").upper().split(",")
         verification_time = request.POST.get("verification_time").split(",")
         superior_limits = request.POST.get("superior_limits").split(",")
         inferior_limits = request.POST.get("inferior_limits").split(",")
         
-        for asset in assets:
-            if not yf.Ticker(asset.strip() + ".SA").info:
+        for asset, v_time, sup_limit, inf_limit in zip(assets, verification_time, superior_limits, inferior_limits):
+            try:
+                yf.Ticker(asset.strip() + ".SA").info
+            except:
                 return render(
                     request,
                     "index.html",
                     {
-                        "error": "Ativo não encontrado.", asset: 'asset'
+                        "error": f"Ativo '{asset.strip()}' não encontrado",
+                        "name": name,
+                        "email": email,
+                        "assets": ",".join(assets),
+                        "verification_time": ",".join(verification_time),
+                        "superior_limits": ",".join(superior_limits),
+                        "inferior_limits": ",".join(inferior_limits),
                     },
                 )
-            for superior_limit, inferior_limit in zip(superior_limits, inferior_limits):
-                ticker = float((str(yf.Ticker(asset.strip() + ".SA").history(period="1d")["Close"]).strip().split(' ')[5].split('\n')[0]).replace(',', '.')) 
-                if ticker > float(superior_limit):
-                    return render(
-                        request,
-                        "index.html",
-                        {
-                            "error": "O limite superior deve ser maior que o preço atual.", 'asset': asset, 'ticker': ticker
-                        },
-                    )
-                elif ticker < float(inferior_limit):
-                    return render(
-                        request,
-                        "index.html",
-                        {
-                            "error": "O limite inferior deve ser menor que o preço atual.", 'asset': asset, 'ticker': ticker
-                        },
-                    )
-                elif float(superior_limit) < float(inferior_limit):
-                    return render(
-                        request,
-                        "index.html",
-                        {
-                            "error": "O limite superior deve ser maior que o limite inferior.", 'asset': asset, 'ticker': ticker
-                        },
-                    )
+            
+            ticker = float(str(yf.Ticker(asset.strip() + ".SA").history(period="1d")["Close"]).strip().split(" ")[5].split("\n")[0].replace(",", "."))
+            
+            if ticker > float(sup_limit):
+                return render(
+                    request,
+                    "index.html",
+                    {
+                        "error": f"O limite superior do ativo '{asset.strip()}' deve ser maior que o preço atual",
+                        "name": name,
+                        "email": email,
+                        "assets": ",".join(assets),
+                        "verification_time": ",".join(verification_time),
+                        "superior_limits": ",".join(superior_limits),
+                        "inferior_limits": ",".join(inferior_limits),
+                        "ticker": ticker,
+                    },
+                )
+            elif ticker < float(inf_limit):
+                return render(
+                    request,
+                    "index.html",
+                    {
+                        "error": f"O limite inferior do ativo '{asset.strip()}' deve ser menor que o preço atual",
+                        "name": name,
+                        "email": email,
+                        "assets": ",".join(assets),
+                        "verification_time": ",".join(verification_time),
+                        "superior_limits": ",".join(superior_limits),
+                        "inferior_limits": ",".join(inferior_limits),
+                        "ticker": ticker,
+                    },
+                )
+            elif float(sup_limit) < float(inf_limit):
+                return render(
+                    request,
+                    "index.html",
+                    {
+                        "error": f"O limite superior do ativo '{asset.strip()}' deve ser maior que o limite inferior",
+                        "name": name,
+                        "email": email,
+                        "assets": ",".join(assets),
+                        "verification_time": ",".join(verification_time),
+                        "superior_limits": ",".join(superior_limits),
+                        "inferior_limits": ",".join(inferior_limits),
+                        "ticker": ticker,
+                    },
+                )
 
         user = User(name=name)
         user.save()
@@ -108,12 +140,12 @@ def save_values(request):
         email_obj = Email(address=email, user=user)
         email_obj.save()
 
-        for i, asset in enumerate(assets):
+        for asset, v_time, sup_limit, inf_limit in zip(assets, verification_time, superior_limits, inferior_limits):
             asset_obj = Asset(
                 name=asset.strip() + ".SA",
-                verification_time=int(verification_time[i].strip()),
-                superior_limit=float(superior_limits[i].strip()),
-                inferior_limit=float(inferior_limits[i].strip()),
+                verification_time=int(v_time.strip()),
+                superior_limit=float(sup_limit.strip()),
+                inferior_limit=float(inf_limit.strip()),
                 user=user,
             )
             asset_obj.save()
@@ -261,7 +293,51 @@ def add_assets(request, email):
         verification_time = int(request.POST.get("verification_time"))
         superior_limit = float(request.POST.get("superior_limit"))
         inferior_limit = float(request.POST.get("inferior_limit"))
-
+        
+        ticker = None
+        try: 
+            ticker = yf.Ticker(asset_name.upper() + ".SA").info
+        except:
+            return render(
+                request, 
+                "add_assets.html", 
+                    {
+                        "error": "Ativo não encontrado",
+                        "asset_name": asset_name,
+                        "verification_time": verification_time,
+                        "superior_limit": superior_limit,
+                        "inferior_limit": inferior_limit,
+                        "ticker": ticker,
+                    },
+                )
+        ticker = float((str(yf.Ticker(asset_name.strip() + ".SA").history(period="1d")["Close"]).strip().split(' ')[5].split('\n')[0]).replace(',', '.')) 
+        if ticker > float(superior_limit):
+            return render(
+                request, 
+                "add_assets.html", 
+                    {
+                        "error": "Ativo acima do limite superior",
+                        "asset_name": asset_name,
+                        "verification_time": verification_time,
+                        "superior_limit": superior_limit,
+                        "inferior_limit": inferior_limit,
+                        "ticker": ticker,
+                    },
+                )
+        elif ticker < float(inferior_limit):
+            return render(
+                request, 
+                "add_assets.html", 
+                    {
+                        "error": "Ativo abaixo do limite inferior",
+                        "asset_name": asset_name,
+                        "verification_time": verification_time,
+                        "superior_limit": superior_limit,
+                        "inferior_limit": inferior_limit,
+                        "ticker": ticker,
+                    },
+                )
+        
         user = User.objects.get(email__address=email)
         Asset.objects.create(
             name=asset_name.upper() + ".SA",
@@ -329,3 +405,5 @@ def update_asset(request, email, asset):
         return redirect("show_asset_info", email=email)
 
     return render(request, "update_asset.html", {"asset": asset})
+
+

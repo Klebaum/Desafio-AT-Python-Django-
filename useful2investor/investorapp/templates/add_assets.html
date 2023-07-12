@@ -8,19 +8,22 @@
 <body>
     <div class = 'conta'>
         <h1>Adicionar Ativos</h1>
+        {% if error %}
+            <p>{{ error }}{{ asset }}:{{ ticker|floatformat:2 }}</p>
+        {% endif %}
         <form method="post">
             {% csrf_token %}
             <label for="asset_name">Nome do Ativo:</label>
-            <input type="text" id="asset_name" name="asset_name" required><br><br>
+            <input type="text" id="asset_name" name="asset_name" required value="{{ asset_name }}"><br><br>
 
             <label for="verification_time">Tempo de Verificação (minutos):</label>
-            <input type="number" id="verification_time" name="verification_time" required><br><br>
+            <input type="number" id="verification_time" name="verification_time" required value="{{ verification_time }}"><br><br>
 
             <label for="superior_limit">Limite Superior:</label>
-            <input type="number" step="0.01" id="superior_limit" name="superior_limit" required><br><br>
+            <input type="number" step="0.01" id="superior_limit" name="superior_limit" required value="{{ superior_limit }}"><br><br>
 
             <label for="inferior_limit">Limite Inferior:</label>
-            <input type="number" step="0.01" id="inferior_limit" name="inferior_limit" required><br><br>
+            <input type="number" step="0.01" id="inferior_limit" name="inferior_limit" required value="{{ inferior_limit }}"><br><br>
             
             <table class="tl_add">
                 <tr>

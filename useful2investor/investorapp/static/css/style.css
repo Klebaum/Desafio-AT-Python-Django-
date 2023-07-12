@@ -101,6 +101,7 @@ input[type=email] {
     background-color: #0F8B8D;
     color: #fff;
     cursor: pointer;
+    margin-left: 120px;
 }
 
 .btn2 {
